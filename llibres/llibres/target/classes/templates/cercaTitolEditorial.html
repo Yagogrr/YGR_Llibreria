@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerca per Títol i Editorial</title>
+</head>
+<body>
+    <h1>Cerca Llibres per Títol i Editorial</h1>
+
+    <form action="/cercaTitolEditorial" method="post">
+        <div>
+            <label for="titol">Títol:</label>
+            <input type="text" id="titol" name="titol" required>
+        </div>
+        <div>
+            <label for="editorial">Editorial:</label>
+            <input type="text" id="editorial" name="editorial" required>
+        </div>
+        <button type="submit">Cerca</button>
+    </form>
+
+    <div th:if="${resultats != null}">
+        <h2 th:text="'Resultats per Títol: ' + ${titolCercat} + ' i Editorial: ' + ${editorialCercada}">Resultats de la Cerca</h2>
+        <div th:if="${resultats.isEmpty()}">
+            <p class="no-results">No s'han trobat llibres amb aquest títol i editorial.</p>
+        </div>
+        <div th:unless="${resultats.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Títol</th>
+                        <th>Autor</th>
+                        <th>Editorial</th>
+                        <th>Data de Publicació</th>
+                        <th>Temàtica</th>
+                        <th>ISBN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="llibre : ${resultats}">
+                        <td th:text="${llibre.titol}"></td>
+                        <td th:text="${llibre.autor}"></td>
+                        <td th:text="${llibre.editorial}"></td>
+                        <td th:text="${#temporals.format(llibre.datapublicacio, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${llibre.tematica}"></td>
+                        <td th:text="${llibre.isbn}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

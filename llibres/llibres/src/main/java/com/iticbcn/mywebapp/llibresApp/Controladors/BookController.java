@@ -111,14 +111,14 @@ public class BookController {
             model.addAttribute("llibreErr", llibreErr);
             return "inserir";
         }
-        if (!repoll.validarISBN(isbn)) { 
+        if (!repoll.validarISBN(isbn)) {
             llibreErr = true;
             message = "ISBN invalid";
             model.addAttribute("message", message);
             model.addAttribute("llibreErr", llibreErr);
             return "inserir";
         }
-        if(titol.isBlank()){
+        if (titol.isBlank()) {
             llibreErr = true;
             message = "El titol no pot estar buit";
             model.addAttribute("message", message);
@@ -126,7 +126,7 @@ public class BookController {
             return "inserir";
         }
 
-        try{
+        try {
             Llibre llibre = new Llibre();
             llibre.setTitol(titol);
             llibre.setAutor(autor);
@@ -135,14 +135,13 @@ public class BookController {
             llibre.setTematica(tematica);
             llibre.setIsbn(isbn);
             repoll.save(llibre);
-        } catch(Exception e){
+        } catch (Exception e) {
             llibreErr = true;
             message = "ISBN o Tiol duplicat";
             model.addAttribute("message", message);
             model.addAttribute("llibreErr", llibreErr);
             return "inserir";
         }
-        
 
         Set<Llibre> llibres = repoll.findAll();
         model.addAttribute("llibres", llibres);
@@ -152,42 +151,57 @@ public class BookController {
 
     @PostMapping("/cercaid")
     public String cercaId(@ModelAttribute("users") Usuaris users,
-            @RequestParam(name = "id_Llibre", required = false) String id_Llibre,
+            @RequestParam(name = "titol_llibre", required = true) String titol_llibre,
             Model model) {
 
-        Long idLlib = null;
         String message = "";
         boolean llibreErr = false;
 
-        if (id_Llibre == null || id_Llibre.trim().isEmpty()) {
-            message = "La id del llibre no pot estar buida.";
+        if (titol_llibre == null || titol_llibre.trim().isEmpty()) {
+            message = "El titol del llibre no pot estar buit.";
             llibreErr = true;
         } else {
+
             try {
-                id_Llibre = id_Llibre.trim();
-                idLlib = Long.parseLong(id_Llibre);
-                Optional<Llibre> llibre = repoll.findById_Llibre(idLlib);
+                titol_llibre = titol_llibre.trim();
+                Optional<Llibre> llibre = repoll.findByTitol(titol_llibre);
                 if (llibre.isPresent()) {
                     model.addAttribute("llibre", llibre.get());
                 } else {
-                    throw new Exception("No hi ha cap llibre amb aquesta id");
+                    throw new Exception("No hi ha cap llibre amb aquest titol");
                 }
 
-            } catch (NumberFormatException e) {
-                message = "La id de llibre ha de ser un nombre enter";
-                llibreErr = true;
             } catch (Exception e) {
                 // En caso de que no se encuentre el libro o cualquier otro error, mostramos el
                 // mensaje de error
                 message = e.getMessage();
                 llibreErr = true;
             }
+
         }
         model.addAttribute("message", message);
         model.addAttribute("llibreErr", llibreErr);
 
         // Retornamos la vista cercaid (el usuario permanecerá en la misma pantalla)
         return "cercaid";
+    }
+
+    @GetMapping("/cercaTitolEditorial")
+    public String inputCercaTitolEditorial(@ModelAttribute("users") Usuaris users, Model model) {
+        model.addAttribute("resultats", null); // Inicialitzem els resultats a null
+        return "cercaTitolEditorial";
+    }
+
+    @PostMapping("/cercaTitolEditorial")
+    public String cercaTitolEditorial(@ModelAttribute("users") Usuaris users,
+                                      @RequestParam(name = "titol") String titol,
+                                      @RequestParam(name = "editorial") String editorial,
+                                      Model model) {
+        Set<Llibre> resultats = repoll.findByTitolAndEditorial(titol, editorial);
+        model.addAttribute("resultats", resultats);
+        model.addAttribute("titolCercat", titol);
+        model.addAttribute("editorialCercada", editorial);
+        return "cercaTitolEditorial";
     }
 
 }

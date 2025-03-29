@@ -21,7 +21,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Llibre findByTitol(String titol) {
+    public Optional<Llibre> findByTitol(String titol) {
         return repo.findByTitol(titol);
     }
 
@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
         // Verificar que las dos primeras posiciones sean letras
         String prefix = isbn.substring(0, 2);
         if (!prefix.matches("[A-Za-z]{2}")) {
-            System.out.println("Las dos primeras posiciones del ISBN deben ser letras.");
+            System.out. println("Las dos primeras posiciones del ISBN deben ser letras.");
             return false;
         }
     
